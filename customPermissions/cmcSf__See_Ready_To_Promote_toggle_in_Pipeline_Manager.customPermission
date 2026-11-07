@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomPermission xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Controls the visibility of the &apos;Show Ready to Promote Only&apos; toggle in the Pipeline Manager&apos;s environment page.</description>
+    <isLicensed>false</isLicensed>
+    <label>See Ready To Promote toggle in Pipeline Manager</label>
+</CustomPermission>

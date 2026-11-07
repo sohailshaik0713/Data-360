@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>65.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <customErrors>
+        <name>Environment_not_in_Pipeline</name>
+        <label>Environment not in Pipeline</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <customErrorMessages>
+            <errorMessage>This Environment is not connected to the specified Pipeline. Please ensure the Environment is part of a Pipeline Connection (Source or Destination) before saving.</errorMessage>
+            <isFieldError>false</isFieldError>
+        </customErrorMessages>
+    </customErrors>
+    <customErrors>
+        <name>Pipeline_Not_Active_Error</name>
+        <label>Pipeline Not Active Error</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <customErrorMessages>
+            <errorMessage>The selected Pipeline is not active. Please activate the Pipeline before associating it with this Monitored Environment.</errorMessage>
+            <isFieldError>false</isFieldError>
+        </customErrorMessages>
+    </customErrors>
+    <decisions>
+        <name>If_Pipeline_Connection_Exists</name>
+        <label>If Pipeline Connection Exists</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnector>
+            <targetReference>Get_Pipeline_Record</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>Does Exist</defaultConnectorLabel>
+        <rules>
+            <name>Doesn_t_Exist</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Get_Pipeline_Connection</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Environment_not_in_Pipeline</targetReference>
+            </connector>
+            <label>Doesn&apos;t Exist</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <name>Is_Pipeline_Active</name>
+        <label>Is Pipeline Active?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnector>
+            <targetReference>Update_Pipeline_Lookup</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>Is Active</defaultConnectorLabel>
+        <rules>
+            <name>Is_Not_Active</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Get_Pipeline_Record.copado__Active__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Pipeline_Not_Active_Error</targetReference>
+            </connector>
+            <label>Is Not Active</label>
+        </rules>
+    </decisions>
+    <environments>Default</environments>
+    <interviewLabel>Monitored Environment Processor {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Monitored Environment Processor</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <recordLookups>
+        <name>Get_Pipeline_Connection</name>
+        <label>Get Pipeline Connection</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>If_Pipeline_Connection_Exists</targetReference>
+        </connector>
+        <filterLogic>(1 OR 2) AND 3</filterLogic>
+        <filters>
+            <field>copado__Source_Environment__c</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.Environment__c</elementReference>
+            </value>
+        </filters>
+        <filters>
+            <field>copado__Destination_Environment__c</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.Environment__c</elementReference>
+            </value>
+        </filters>
+        <filters>
+            <field>copado__Deployment_Flow__c</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.Pipeline__c</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>copado__Deployment_Flow_Step__c</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordLookups>
+        <name>Get_Pipeline_Record</name>
+        <label>Get Pipeline Record</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Is_Pipeline_Active</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.Pipeline__c</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>copado__Deployment_Flow__c</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordUpdates>
+        <name>Update_Pipeline_Lookup</name>
+        <label>Update Pipeline Lookup</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <inputAssignments>
+            <field>Pipeline__c</field>
+            <value>
+                <elementReference>Get_Pipeline_Connection.copado__Deployment_Flow__c</elementReference>
+            </value>
+        </inputAssignments>
+        <inputReference>$Record</inputReference>
+    </recordUpdates>
+    <start>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Get_Pipeline_Connection</targetReference>
+        </connector>
+        <object>Monitored_Environments__c</object>
+        <recordTriggerType>CreateAndUpdate</recordTriggerType>
+        <triggerType>RecordBeforeSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>

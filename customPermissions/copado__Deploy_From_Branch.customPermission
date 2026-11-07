@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomPermission xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Part of the Release Branch Strategy feature. Grants the user permission to see and interact with the &apos;Deploy from Branch&apos; button on a Release record.</description>
+    <isLicensed>false</isLicensed>
+    <label>Deploy From Branch</label>
+</CustomPermission>
